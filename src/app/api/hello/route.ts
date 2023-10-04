@@ -16,13 +16,11 @@ type ResponseData = {
     AIResponse: ChainValues;
   }[];
 };
-export async function GET(
-  req: NextApiRequest,
-  res: NextApiResponse<ResponseData>
-) {
-  
+export async function POST(req: Request) {
   const loader = new PDFLoader("sodapdf-converted.pdf");
+  const body = await req.json();
 
+  // const body = JSON.parse(req.body);
   const docs = await loader.load();
   const textSplitter = new RecursiveCharacterTextSplitter({
     chunkSize: 500,
@@ -43,40 +41,50 @@ export async function GET(
     openAIApiKey: process.env.OPENAI_API_KEY,
   });
 
-  const template = `Use the following pieces of context to answer the question at the end.
-                    If you don't know the answer, just say that you don't know, don't try to make up an answer.
-                    Use three sentences maximum and keep the answer as concise as possible.
-                    Always say "thanks for asking!" at the end of the answer.
-                    {context}
-                    Question: {question}
-                    Helpful Answer:`;
+  const CUSTOM_QUESTION_GENERATOR_CHAIN_PROMPT = `/*
+  Objective: Extract pertinent context from a conversation history and summarise in no more than one paragrapgh
+  
+  Input:
+  - Chat History: ${body?.history}
+  - New Question: ${body?.question}
+  
+  Guidelines:
+  - Extract Relevant Context: Identify and extract any section from the chat history that provides relevant context to the New question.
+  
+  Use the following pieces of context to answer the user's question.
+  If you don't know the answer, just say that you don't know, don't try to make up an answer.
+  Answer Format:
+  Utilize the structure below to format your response:
+  
+  [Your formulated response goes here]
+  */
+  `;
+
+
 
   const chain = RetrievalQAChain.fromLLM(model, vectorStore.asRetriever());
   const response = await chain.call({
-    query: `You are an AI language model assistant. Your task is to generate five 
-    different versions of the given user question to retrieve relevant documents from a vector 
-    database.  question is ${req.body?.question}
-    Provide these alternative questions seperated by newlines. add the orginal question as part of the response. if the previous chat history exist, you can use it. previous chat history is ${req.body?.history}. 
-    If something went wrong with the question, just say that you don't know, don't try to make up an answer.
-
-    Original question: {question}`,
+    query: CUSTOM_QUESTION_GENERATOR_CHAIN_PROMPT,
   });
+
 
   let newhistory: ResponseData = {
     response: [],
   };
-  if (req.body?.question && req.body?.history) {
+
+  if (body?.question && body?.history) {
+    
     newhistory = {
       response: [
-        ...req.body.history,
-        { humanQuestion: req.body.question, AIResponse: response.text },
+        ...body?.history,
+        { humanQuestion: body?.question, AIResponse: response.text },
       ],
     };
-  } else if (req.body?.question) {
+    console.log("question", body);
+
+  } else if (body?.question) {
     newhistory = {
-      response: [
-        { humanQuestion: req.body.question, AIResponse: response.text },
-      ],
+      response: [{ humanQuestion: body?.question, AIResponse: response.text }],
     };
   } else {
     newhistory = {
@@ -85,16 +93,9 @@ export async function GET(
       ],
     };
   }
+
   //  let history = new ChatMessageHistory()
 
   console.log("response", newhistory);
-  console.log("question", req.body);
   return NextResponse.json(newhistory);
 }
-
-
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
