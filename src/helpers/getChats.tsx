@@ -10,15 +10,15 @@ type historyType={
 
 
 }
-export async function getChat(prop: props){
+export async function getChat(prop: props):Promise<historyType[]>{
 
     try {
-        const response=await axios.post("http://localhost:3000/api/hello",prop)
+        const response=await axios.post("http://localhost:3000/api/gpt",prop)
 
     console.log(response.data)
 
     if(response.data.response){
-        return response.data.response
+        return response.data.response 
 
     } 
     else{
@@ -30,7 +30,7 @@ export async function getChat(prop: props){
         throw new Error(error.message)
         }
         
-        throw new Error("something went wrong! send you messeage again")
+        throw new Error("Something went wrong")
     }
 
 }
