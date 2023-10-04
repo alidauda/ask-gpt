@@ -28,6 +28,7 @@ model Account {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
+  @@index([userId])
 }
 
 model Session {
@@ -36,6 +37,8 @@ model Session {
   userId       String
   expires      DateTime
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 model User {
@@ -46,6 +49,18 @@ model User {
   image         String?
   accounts      Account[]
   sessions      Session[]
+  Pdf           Pdf[]
+}
+
+model Pdf {
+  id     String @id @default(cuid())
+  name   String
+  url    String
+  key    String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+
+  @@index([userId])
 }
 
 model VerificationToken {
