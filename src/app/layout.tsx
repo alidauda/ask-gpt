@@ -1,6 +1,7 @@
 import NextAuthProvider from '@/helpers/nextauth';
 import './globals.css';
 
+import QueryProvider from './queryProvider';
 export default function RootLayout({
   children,
 }: {
@@ -9,7 +10,8 @@ export default function RootLayout({
   return (
     <html lang='en'>
       <body>
-        <NextAuthProvider>{children}</NextAuthProvider>
+                  <NextAuthProvider>{children}</NextAuthProvider>
+
       </body>
     </html>
   );
