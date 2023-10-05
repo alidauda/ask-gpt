@@ -1,30 +1,50 @@
-import { PDFLoader } from 'langchain/document_loaders/fs/pdf';
+import { CheerioWebBaseLoader } from 'langchain/document_loaders/web/cheerio';
 import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter';
 import { OpenAIEmbeddings } from 'langchain/embeddings/openai';
 import { MemoryVectorStore } from 'langchain/vectorstores/memory';
-import { ConversationChain, RetrievalQAChain } from 'langchain/chains';
+import { WebPDFLoader } from 'langchain/document_loaders/web/pdf';
 import { ChatOpenAI } from 'langchain/chat_models/openai';
 import { NextResponse } from 'next/server';
-import { ConversationSummaryMemory } from 'langchain/memory';
-import { NextApiRequest, NextApiResponse } from 'next';
-import { type } from 'os';
 import { ChainValues } from 'langchain/schema';
+import * as z from 'zod';
+import { getServerAuthSession } from '@/utils/auth';
+import { BufferMemory } from 'langchain/memory';
+import { ConversationalRetrievalQAChain } from 'langchain/chains';
+import prisma from '@/utils/db';
+const tupleType = z.tuple([z.string(), z.string()]);
+const bodySchema = z.object({
+  pdf: z.string(),
+  question: z.string(),
+  history: z.array(tupleType),
+});
 
-type ResponseData = {
-  response: {
-    humanQuestion: string;
-    AIResponse: ChainValues;
-  }[];
-};
 export async function POST(req: Request) {
-  const loader = new PDFLoader('sodapdf-converted.pdf');
+  const session = await getServerAuthSession();
+  if (!session) {
+    return NextResponse.json({ error: 'no response' });
+  }
   const body = await req.json();
+  const validate = bodySchema.safeParse(body);
+  if (!validate.success) {
+    return NextResponse.json(validate.error);
+  }
+  const url = await prisma.pdf.findUnique({
+    where: {
+      id: validate.data.pdf,
+    },
+  });
+  if (!url) {
+    return NextResponse.json({ error: 'no pdf found' });
+  }
+  const pdf = await fetch(url.url);
+  const blob = await pdf.blob();
+
+  const loader = new WebPDFLoader(blob);
 
   // const body = JSON.parse(req.body);
   const docs = await loader.load();
   const textSplitter = new RecursiveCharacterTextSplitter({
-    chunkSize: 500,
-    chunkOverlap: 0,
+    chunkSize: 1000,
   });
   const splitDocs = await textSplitter.splitDocuments(docs);
   const embeddings = new OpenAIEmbeddings({
@@ -38,15 +58,14 @@ export async function POST(req: Request) {
 
   const model = new ChatOpenAI({
     modelName: 'gpt-3.5-turbo',
-    openAIApiKey: process.env.OPENAI_API_KEY,
+    temperature: 0,
   });
-
   const CUSTOM_QUESTION_GENERATOR_CHAIN_PROMPT = `/*
   Objective: Extract pertinent context from a conversation history and summarise in no more than one paragrapgh
   
   Input:
-  - Chat History: ${body?.history}
-  - New Question: ${body?.question}
+  - Chat History: ${validate.data.history}
+  - New Question: ${validate.data.question}
   
   Guidelines:
   - Extract Relevant Context: Identify and extract any section from the chat history that provides relevant context to the New question.
@@ -60,35 +79,24 @@ export async function POST(req: Request) {
   */
   `;
 
-  const chain = RetrievalQAChain.fromLLM(model, vectorStore.asRetriever());
+  const chain = ConversationalRetrievalQAChain.fromLLM(
+    model,
+    vectorStore.asRetriever(),
+    {
+      memory: new BufferMemory({
+        memoryKey: 'chat_history',
+        returnMessages: true,
+      }),
+      questionGeneratorChainOptions: {
+        template: CUSTOM_QUESTION_GENERATOR_CHAIN_PROMPT,
+      },
+    }
+  );
   const response = await chain.call({
-    query: CUSTOM_QUESTION_GENERATOR_CHAIN_PROMPT,
+    question: validate.data.question,
   });
-
-  let newhistory: ResponseData = {
-    response: [],
-  };
-
-  if (body?.question && body?.history) {
-    newhistory = {
-      response: [
-        ...body?.history,
-        { humanQuestion: body?.question, AIResponse: response.text },
-      ],
-    };
-  } else if (body?.question) {
-    newhistory = {
-      response: [{ humanQuestion: body?.question, AIResponse: response.text }],
-    };
-  } else {
-    newhistory = {
-      response: [
-        { humanQuestion: 'unknown question', AIResponse: response.text },
-      ],
-    };
-  }
 
   //  let history = new ChatMessageHistory()
 
-  return NextResponse.json(newhistory);
+  return NextResponse.json(response.text);
 }
