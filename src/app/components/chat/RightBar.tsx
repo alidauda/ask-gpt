@@ -7,6 +7,8 @@ import { getChat } from "@/helpers/getChats";
 import { useMutation } from "@tanstack/react-query";
 import ChatSection, { historyType } from "./ChatSection";
 
+import { QueryClient, QueryClientProvider } from 'react-query';
+const queryClient = new QueryClient();
 export default function RightBar() {
 
     const [data, setData]=useState<historyType[]>([])

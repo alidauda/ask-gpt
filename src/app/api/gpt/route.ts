@@ -1,14 +1,14 @@
-import { PDFLoader } from "langchain/document_loaders/fs/pdf";
-import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
-import { OpenAIEmbeddings } from "langchain/embeddings/openai";
-import { MemoryVectorStore } from "langchain/vectorstores/memory";
-import { ConversationChain, RetrievalQAChain } from "langchain/chains";
-import { ChatOpenAI } from "langchain/chat_models/openai";
-import { NextResponse } from "next/server";
-import { ConversationSummaryMemory } from "langchain/memory";
-import { NextApiRequest, NextApiResponse } from "next";
-import { type } from "os";
-import { ChainValues } from "langchain/schema";
+import { PDFLoader } from 'langchain/document_loaders/fs/pdf';
+import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter';
+import { OpenAIEmbeddings } from 'langchain/embeddings/openai';
+import { MemoryVectorStore } from 'langchain/vectorstores/memory';
+import { ConversationChain, RetrievalQAChain } from 'langchain/chains';
+import { ChatOpenAI } from 'langchain/chat_models/openai';
+import { NextResponse } from 'next/server';
+import { ConversationSummaryMemory } from 'langchain/memory';
+import { NextApiRequest, NextApiResponse } from 'next';
+import { type } from 'os';
+import { ChainValues } from 'langchain/schema';
 
 type ResponseData = {
   response: {
@@ -17,7 +17,7 @@ type ResponseData = {
   }[];
 };
 export async function POST(req: Request) {
-  const loader = new PDFLoader("sodapdf-converted.pdf");
+  const loader = new PDFLoader('sodapdf-converted.pdf');
   const body = await req.json();
 
   // const body = JSON.parse(req.body);
@@ -37,7 +37,7 @@ export async function POST(req: Request) {
   );
 
   const model = new ChatOpenAI({
-    modelName: "gpt-3.5-turbo",
+    modelName: 'gpt-3.5-turbo',
     openAIApiKey: process.env.OPENAI_API_KEY,
   });
 
@@ -60,28 +60,22 @@ export async function POST(req: Request) {
   */
   `;
 
-
-
   const chain = RetrievalQAChain.fromLLM(model, vectorStore.asRetriever());
   const response = await chain.call({
     query: CUSTOM_QUESTION_GENERATOR_CHAIN_PROMPT,
   });
-
 
   let newhistory: ResponseData = {
     response: [],
   };
 
   if (body?.question && body?.history) {
-    
     newhistory = {
       response: [
         ...body?.history,
         { humanQuestion: body?.question, AIResponse: response.text },
       ],
     };
-    console.log("question", body);
-
   } else if (body?.question) {
     newhistory = {
       response: [{ humanQuestion: body?.question, AIResponse: response.text }],
@@ -89,13 +83,12 @@ export async function POST(req: Request) {
   } else {
     newhistory = {
       response: [
-        { humanQuestion: "unknown question", AIResponse: response.text },
+        { humanQuestion: 'unknown question', AIResponse: response.text },
       ],
     };
   }
 
   //  let history = new ChatMessageHistory()
 
-  console.log("response", newhistory);
   return NextResponse.json(newhistory);
 }
