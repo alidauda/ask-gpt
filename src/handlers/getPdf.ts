@@ -1,6 +1,7 @@
 import prisma from '@/utils/db';
-
-export async function getPdfs(id: string) {
+import { cache } from 'react';
+export const revalidate = 3600;
+export const getPdfs = cache(async (id: string) => {
   const pdf = await prisma.pdf.findMany({
     where: {
       userId: id,
@@ -12,4 +13,4 @@ export async function getPdfs(id: string) {
     },
   });
   return pdf;
-}
+});

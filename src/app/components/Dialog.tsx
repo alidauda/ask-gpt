@@ -8,12 +8,12 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+
 import { UploadDropzone } from '@/utils/uploadthing';
 import { Plus } from 'lucide-react';
-
+import { useRouter } from 'next/navigation';
 export function DialogDemo() {
+  const router = useRouter();
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -43,8 +43,9 @@ export function DialogDemo() {
                     key: data[0].key,
                   }),
                 });
-                const pdfData = await pdf.json();
-                console.log(pdfData);
+                if (!pdf.ok) return;
+
+                router.refresh();
               }}
             />
           </div>
