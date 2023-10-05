@@ -8,7 +8,7 @@ export function useFetchQuestions() {
   const [isLoading, setLoading] = useState(false);
   const [data, setData] = useState<{
     message: Message[];
-    history: [string, string][];
+    history: { question: string; answer: string }[];
   }>({
     message: [
       {
@@ -63,7 +63,7 @@ export function useFetchQuestions() {
             message: postData,
           },
         ],
-        history: [...item.history, [question, postData]],
+        history: [...item.history, { answer: postData, question }],
       }));
 
       setLoading(false);
