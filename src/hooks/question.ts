@@ -14,7 +14,7 @@ export function useFetchQuestions() {
       {
         type: 'apiMessage',
         message:
-          "Hello, I'm a bot that can answer questions from a pdf. You can ask me questions like 'What is the capital of India?' or 'What is the population of India?'",
+          "Hello, I'm a bot that can answer questions from a pdf. You can ask me questions like /n 'What is the capital of India?' or 'What is the population of India?'",
       },
     ],
     history: [],

@@ -10,7 +10,7 @@ import { getChat } from '@/helpers/getChats';
 import { useFetchQuestions } from '@/hooks/question';
 import ChatSection from './ChatSection';
 
-export default function RightBar() {
+export default function RightBar({ id }: { id: string }) {
   const { fetchAnswers, data, isLoading } = useFetchQuestions();
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -20,13 +20,12 @@ export default function RightBar() {
     const question = formData.get('question') as string;
     if (question) {
       await fetchAnswers({
-        pdfName: 'clncc8di90003uok0hpnfce5m',
+        pdfName: id,
         question: question,
       });
       //clear fields
-      if (formElement) {
-        formElement.reset();
-      }
+
+      formElement.delete();
     }
     console.log(formData.get('question'));
   }
@@ -34,7 +33,9 @@ export default function RightBar() {
 
   return (
     <div className='w-[70vw] h-[inherit] bg-white min-h-[90vh] border-l border-gray-300 flex flex-col justify-between overflow-hidden'>
-      <div className="h-[75vh] overflow-y-scroll scroll-auto	">{data && <ChatSection message={data.message} />}</div>
+      <div className='h-[75vh] overflow-y-scroll scroll-auto	'>
+        {data && <ChatSection message={data.message} />}
+      </div>
       <form
         className='border-t h-[10vh] flex flex-row justify-between items-center'
         onSubmit={onSubmit}
