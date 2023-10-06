@@ -12,7 +12,7 @@ export default function Circular() {
                 cy="25"
                 r={radius}
                 fill="transparent"
-                stroke="purple"
+                stroke="#B0578D"
                 strokeWidth="4"
                 strokeDasharray={circumference}
                 strokeDashoffset={offset}

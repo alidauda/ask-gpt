@@ -5,9 +5,10 @@ import Circular from '../circular';
 
 import { getChat } from '@/helpers/getChats';
 
-import ChatSection, { historyType } from './ChatSection';
+// import ChatSection, { historyType } from './ChatSection';
 
 import { useFetchQuestions } from '@/hooks/question';
+import ChatSection from './ChatSection';
 
 export default function RightBar() {
   const { fetchAnswers, data, isLoading } = useFetchQuestions();
@@ -33,7 +34,7 @@ export default function RightBar() {
 
   return (
     <div className='w-[70vw] h-[inherit] bg-white min-h-[90vh] border-l border-gray-300 flex flex-col justify-between overflow-hidden'>
-      {/* <div className="h-[75vh] overflow-y-scroll scroll-auto	">{data && <ChatSection data={data} />}</div> */}
+      <div className="h-[75vh] overflow-y-scroll scroll-auto	">{data && <ChatSection message={data.message} />}</div>
       <form
         className='border-t h-[10vh] flex flex-row justify-between items-center'
         onSubmit={onSubmit}
@@ -52,7 +53,7 @@ export default function RightBar() {
           <button
             disabled={isLoading}
             type='submit'
-            className='bg-[#43c6dd] w-[10%] h-[5vh] rounded-lg m-4'
+            className='bg-[#B0578D] w-[10%] h-[5vh] rounded-lg m-4'
           >
             send
           </button>
