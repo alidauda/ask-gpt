@@ -1,12 +1,7 @@
 'use client';
-
 import { FormEvent, useEffect, useState } from 'react';
 import Circular from '../circular';
-
 import { getChat } from '@/helpers/getChats';
-
-// import ChatSection, { historyType } from './ChatSection';
-
 import { useFetchQuestions } from '@/hooks/question';
 import ChatSection from './ChatSection';
 
