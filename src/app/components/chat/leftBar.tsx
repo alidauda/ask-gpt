@@ -8,7 +8,7 @@ export default async function LeftBar({ url }: { url: string }) {
         src={pdf.url}
         title={pdf.name}
         width={'100%'}
-        height={'800'}
+        height={'550'}
       ></iframe>
     </div>
   );

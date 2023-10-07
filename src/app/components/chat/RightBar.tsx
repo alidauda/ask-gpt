@@ -25,18 +25,18 @@ export default function RightBar({ id }: { id: string }) {
 
   return (
     <div className=' flex flex-col col-span-3  bg-white  border-l border-gray-300  justify-between '>
-      <div className='h-[75vh] overflow-y-scroll scroll-auto	'>
+      <div className='max-h-[75vh] overflow-y-scroll scroll-auto	'>
         {data && <ChatSection message={data.message} isLoading={isLoading} />}
       </div>
       <form
-        className='border-t h-36 flex flex-row justify-between items-center p-6'
+        className='border-t h-[10vh] flex flex-row justify-between items-center p-6'
         onSubmit={onSubmit}
       >
         <Input
           onChange={(e) => setQuestion(e.target.value)}
           defaultValue={question}
           type='text'
-          className=' w-[85%]  bg-white p-2 h-24 '
+          className=' w-[85%]  bg-white p-2  '
           placeholder='Please enter a question'
         />
         {isLoading ? (
