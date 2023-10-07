@@ -15,7 +15,7 @@ const tupleType = z.tuple([z.string(), z.string()]);
 const bodySchema = z.object({
   pdf: z.string(),
   question: z.string(),
-  history: z.array(tupleType),
+  history: z.array(z.object({ answer: z.string(), question: z.string() })),
 });
 
 export async function POST(req: Request) {

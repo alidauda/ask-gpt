@@ -14,7 +14,7 @@ export function useFetchQuestions() {
       {
         type: 'apiMessage',
         message:
-          "Hello, I'm a bot that can answer questions from a pdf. You can ask me questions like 'What is the capital of India?' or 'What is the population of India?'",
+          "Hello, I'm a bot that can answer questions from a pdf. You can ask me questions related to the pdf.",
       },
     ],
     history: [],
@@ -54,7 +54,7 @@ export function useFetchQuestions() {
         setError('Something went wrong');
       }
       const postData = await post.json();
-      console.log(postData);
+
       setData((item) => ({
         ...item,
         message: [

@@ -14,3 +14,17 @@ export const getPdfs = cache(async (id: string) => {
   });
   return pdf;
 });
+
+export const getOnePdf = cache(async (id: string) => {
+  const pdf = await prisma.pdf.findUniqueOrThrow({
+    where: {
+      id,
+    },
+    select: {
+      id: true,
+      name: true,
+      url: true,
+    },
+  });
+  return pdf;
+});
