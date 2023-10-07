@@ -48,6 +48,7 @@ export function useFetchQuestions() {
           history: data.history,
         }),
       });
+      
       if (!post.ok) {
         setLoading(false);
         setError('Something went wrong');

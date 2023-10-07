@@ -24,7 +24,7 @@ export default function ChatSection({ message, isLoading }: props) {
                   <TypeAnimation
                     sequence={[value.message]}
                     cursor={false}
-                    speed={65}
+                    speed={99}
                   />
                 </p>
               ) : (
