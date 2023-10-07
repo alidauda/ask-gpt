@@ -1,44 +1,43 @@
 'use client';
-import { FormEvent, useEffect, useState } from 'react';
+import { FormEvent, use, useState } from 'react';
 import Circular from '../circular';
-import { getChat } from '@/helpers/getChats';
+
 import { useFetchQuestions } from '@/hooks/question';
 import ChatSection from './ChatSection';
+import { Input } from '@/components/ui/input';
 
 export default function RightBar({ id }: { id: string }) {
   const { fetchAnswers, data, isLoading } = useFetchQuestions();
+  const [question, setQuestion] = useState('');
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const formElement = e.currentTarget;
+    console.log(question);
 
-    const formData = new FormData(e.currentTarget);
-    const question = formData.get('question') as string;
-    if (question) {
+    if (question.trim().length > 6) {
       await fetchAnswers({
         pdfName: id,
-        question: question,
+        question: question.trim(),
       });
       //clear fields
-
-      formElement.delete();
+      setQuestion('');
     }
-    console.log(formData.get('question'));
   }
   console.log(data);
 
   return (
-    <div className='w-[70vw] h-[inherit] bg-white min-h-[90vh] border-l border-gray-300 flex flex-col justify-between overflow-hidden'>
+    <div className=' h-[inherit] bg-white min-h-[90vh] border-l border-gray-300 col-span-3 justify-between overflow-hidden'>
       <div className='h-[75vh] overflow-y-scroll scroll-auto	'>
-        {data && <ChatSection message={data.message} />}
+        {data && <ChatSection message={data.message} isLoading={isLoading} />}
       </div>
       <form
-        className='border-t h-[10vh] flex flex-row justify-between items-center'
+        className='border-t h-[10vh] flex flex-row justify-between items-center p-6'
         onSubmit={onSubmit}
       >
-        <input
-          name='question'
+        <Input
+          onChange={(e) => setQuestion(e.target.value)}
+          defaultValue={question}
           type='text'
-          className=' h-[10vh] w-[85%] active:outline-1'
+          className=' w-[85%]  bg-white p-2 h-24 '
           placeholder='Please enter a question'
         />
         {isLoading ? (

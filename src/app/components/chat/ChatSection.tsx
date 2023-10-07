@@ -1,12 +1,18 @@
+import { Skeleton } from '@/components/ui/skeleton';
+import ChatLoading from '../ChatSkeleton';
+import { TypeAnimation } from 'react-type-animation';
+
 type Message = {
   type: 'apiMessage' | 'userMessage';
   message: string;
 };
 export type props = {
   message: Message[];
+  isLoading: boolean;
   // history: [string, string][];
 };
-export default function ChatSection({ message }: props) {
+export default function ChatSection({ message, isLoading }: props) {
+  const load = true;
   return (
     <div className=' text-black '>
       {message &&
@@ -15,7 +21,11 @@ export default function ChatSection({ message }: props) {
             <div key={index} className='flex flex-col'>
               {value.type == 'apiMessage' ? (
                 <p className='bg-[#D988B9] w-[60%] self-start rounded-lg p-1 m-1 whitespace-break-spaces'>
-                  {value.message}
+                  <TypeAnimation
+                    sequence={[value.message]}
+                    cursor={false}
+                    speed={65}
+                  />
                 </p>
               ) : (
                 <p className='bg-[#FACBEA] w-[60%] self-end rounded-lg p-1 m-1'>
@@ -25,6 +35,7 @@ export default function ChatSection({ message }: props) {
             </div>
           );
         })}
+      {isLoading && <ChatLoading />}
     </div>
   );
 }

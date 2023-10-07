@@ -2,34 +2,18 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { UploadDropzone } from '@/utils/uploadthing';
-import { buttonVariants } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
-
-import '@uploadthing/react/styles.css';
-import { DialogDemo } from './Dialog';
 import Link from 'next/link';
+import { ReactNode } from 'react';
+import { DialogDemo } from './Dialog';
 
-type Props = {
-  id: string;
-  name: string;
-  url: string;
-}[];
-
-export default function HomePage({ pdfs }: { pdfs: Props }) {
+export default function HomePage({ children }: { children: ReactNode }) {
   return (
     <div className='w-full h-[100dvh]  px-40 bg-purple-100'>
       <nav className='w-full flex justify-between p-10'>
         <div className='text-purple-700 text-2xl'>
-          <p>ChatWPDF</p>
+          <Link href='/'>
+            <p>ChatWPDF</p>
+          </Link>
         </div>
         <div className='flex gap-3 justify-center items-center'>
           <div>
@@ -50,15 +34,7 @@ export default function HomePage({ pdfs }: { pdfs: Props }) {
           </Button>
           <DialogDemo />
         </div>
-        {pdfs.map((item) => (
-          <div key={item.id}>
-            <Link href={`/${item.id}`}>
-              <div className='bg-white p-5 rounded cursor-pointer hover:text-purple-900 shadow my-3'>
-                {item.name}
-              </div>
-            </Link>
-          </div>
-        ))}
+        {children}
       </div>
       {/**/}
     </div>

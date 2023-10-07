@@ -7,7 +7,7 @@ export default function ChatPage({ params }: { params: { slug: string } }) {
   return (
     <div className='bg-[#f5f7f9] min-h-screen '>
       <NavBar />
-      <div className='flex flex-row jus'>
+      <div className='grid grid-cols-5 h-full '>
         <LeftBar url={params.slug} />
         <RightBar id={params.slug} />
       </div>

@@ -11,11 +11,11 @@ import { getServerAuthSession } from '@/utils/auth';
 import { BufferMemory } from 'langchain/memory';
 import { ConversationalRetrievalQAChain } from 'langchain/chains';
 import prisma from '@/utils/db';
-const tupleType = z.tuple([z.string(), z.string()]);
+
 const bodySchema = z.object({
   pdf: z.string(),
   question: z.string(),
-  history: z.array(tupleType),
+  history: z.array(z.object({ answer: z.string(), question: z.string() })),
 });
 
 export async function POST(req: Request) {
@@ -23,44 +23,45 @@ export async function POST(req: Request) {
   if (!session) {
     return NextResponse.json({ error: 'no response' });
   }
-  const body = await req.json();
-  const validate = bodySchema.safeParse(body);
-  if (!validate.success) {
-    return NextResponse.json(validate.error);
-  }
-  const url = await prisma.pdf.findUnique({
-    where: {
-      id: validate.data.pdf,
-    },
-  });
-  if (!url) {
-    return NextResponse.json({ error: 'no pdf found' });
-  }
-  const pdf = await fetch(url.url);
-  const blob = await pdf.blob();
+  try {
+    const body = await req.json();
+    const validate = bodySchema.safeParse(body);
+    if (!validate.success) {
+      return NextResponse.json(validate.error);
+    }
+    const url = await prisma.pdf.findUnique({
+      where: {
+        id: validate.data.pdf,
+      },
+    });
+    if (!url) {
+      return NextResponse.json({ error: 'no pdf found' });
+    }
+    const pdf = await fetch(url.url);
+    const blob = await pdf.blob();
 
-  const loader = new WebPDFLoader(blob);
+    const loader = new WebPDFLoader(blob);
 
-  // const body = JSON.parse(req.body);
-  const docs = await loader.load();
-  const textSplitter = new RecursiveCharacterTextSplitter({
-    chunkSize: 1000,
-  });
-  const splitDocs = await textSplitter.splitDocuments(docs);
-  const embeddings = new OpenAIEmbeddings({
-    openAIApiKey: process.env.OPENAI_API_KEY,
-  });
+    // const body = JSON.parse(req.body);
+    const docs = await loader.load();
+    const textSplitter = new RecursiveCharacterTextSplitter({
+      chunkSize: 1000,
+    });
+    const splitDocs = await textSplitter.splitDocuments(docs);
+    const embeddings = new OpenAIEmbeddings({
+      openAIApiKey: process.env.OPENAI_API_KEY,
+    });
 
-  const vectorStore = await MemoryVectorStore.fromDocuments(
-    splitDocs,
-    embeddings
-  );
+    const vectorStore = await MemoryVectorStore.fromDocuments(
+      splitDocs,
+      embeddings
+    );
 
-  const model = new ChatOpenAI({
-    modelName: 'gpt-3.5-turbo',
-    temperature: 0,
-  });
-  const CUSTOM_QUESTION_GENERATOR_CHAIN_PROMPT = `/*
+    const model = new ChatOpenAI({
+      modelName: 'gpt-3.5-turbo',
+      temperature: 0,
+    });
+    const CUSTOM_QUESTION_GENERATOR_CHAIN_PROMPT = `/*
   Objective: Extract pertinent context from a conversation history and summarise in no more than one paragrapgh
   
   Input:
@@ -79,24 +80,27 @@ export async function POST(req: Request) {
   */
   `;
 
-  const chain = ConversationalRetrievalQAChain.fromLLM(
-    model,
-    vectorStore.asRetriever(),
-    {
-      memory: new BufferMemory({
-        memoryKey: 'chat_history',
-        returnMessages: true,
-      }),
-      questionGeneratorChainOptions: {
-        template: CUSTOM_QUESTION_GENERATOR_CHAIN_PROMPT,
-      },
-    }
-  );
-  const response = await chain.call({
-    question: validate.data.question,
-  });
+    const chain = ConversationalRetrievalQAChain.fromLLM(
+      model,
+      vectorStore.asRetriever(),
+      {
+        memory: new BufferMemory({
+          memoryKey: 'chat_history',
+          returnMessages: true,
+        }),
+        questionGeneratorChainOptions: {
+          template: CUSTOM_QUESTION_GENERATOR_CHAIN_PROMPT,
+        },
+      }
+    );
+    const response = await chain.call({
+      question: validate.data.question,
+    });
 
-  //  let history = new ChatMessageHistory()
+    //  let history = new ChatMessageHistory()
 
-  return NextResponse.json(response.text);
+    return NextResponse.json(response.text);
+  } catch (e) {
+    return NextResponse.json(e);
+  }
 }
