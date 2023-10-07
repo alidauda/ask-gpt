@@ -11,7 +11,6 @@ export default function RightBar({ id }: { id: string }) {
   const [question, setQuestion] = useState('');
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    console.log(question);
 
     if (question.trim().length > 6) {
       await fetchAnswers({
