@@ -1,7 +1,6 @@
 import NextAuthProvider from '@/helpers/nextauth';
 import './globals.css';
 // import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import QueryProvider from './queryProvider';
 export default function RootLayout({
   children,
 }: {

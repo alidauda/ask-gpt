@@ -87,7 +87,6 @@ export async function POST(req: Request) {
   const chatModelResult = await model.call([message]);
 
   return NextResponse.json(chatModelResult.content);
-  // return NextResponse.json(pdfcontent);
 }
 
 // import { CheerioWebBaseLoader } from 'langchain/document_loaders/web/cheerio';
