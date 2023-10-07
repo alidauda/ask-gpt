@@ -25,12 +25,12 @@ export default function RightBar({ id }: { id: string }) {
   console.log(data);
 
   return (
-    <div className=' h-[inherit] bg-white min-h-[90vh] border-l border-gray-300 col-span-3 justify-between overflow-hidden'>
+    <div className=' flex flex-col col-span-3  bg-white  border-l border-gray-300  justify-between '>
       <div className='h-[75vh] overflow-y-scroll scroll-auto	'>
         {data && <ChatSection message={data.message} isLoading={isLoading} />}
       </div>
       <form
-        className='border-t h-[10vh] flex flex-row justify-between items-center p-6'
+        className='border-t h-36 flex flex-row justify-between items-center p-6'
         onSubmit={onSubmit}
       >
         <Input
