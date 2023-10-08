@@ -1,3 +1,4 @@
+'use client';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -8,7 +9,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-
+import '@uploadthing/react/styles.css';
 import { UploadDropzone } from '@/utils/uploadthing';
 import { Plus } from 'lucide-react';
 import { useRouter } from 'next/navigation';

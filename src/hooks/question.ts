@@ -17,7 +17,7 @@ export function useFetchQuestions() {
           "Hello, I'm a bot that can answer questions from a pdf. You can ask me questions related to the pdf.",
       },
     ],
-    history: [],
+    history: [['', '']],
   });
   const [error, setError] = useState('');
 
