@@ -8,8 +8,8 @@ import { DialogDemo } from './Dialog';
 
 export default function HomePage({ children }: { children: ReactNode }) {
   return (
-    <div className='w-full h-[100dvh]  px-40 bg-purple-100'>
-      <nav className='w-full flex justify-between p-10'>
+    <div className='w-full h-[100dvh]  lg:px-40 bg-purple-100'>
+      <nav className='w-full flex justify-between lg:p-10 p-3'>
         <div className='text-purple-700 text-2xl'>
           <Link href='/'>
             <p>ChatWPDF</p>
@@ -26,7 +26,7 @@ export default function HomePage({ children }: { children: ReactNode }) {
         </div>
       </nav>
 
-      <div className='px-72 py-11  '>
+      <div className='lg:px-72 lg:py-11  p-3'>
         <div className='flex gap-2 justify-center items-center '>
           <Input className='bg-white w-full p-3 ' placeholder='search' />
           <Button className='bg-white text-purple-900 hover:bg-purple-300'>
