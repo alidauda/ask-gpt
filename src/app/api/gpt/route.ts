@@ -20,11 +20,11 @@ const bodySchema = z.object({
 });
 
 export async function POST(req: Request) {
-  const session = await getServerAuthSession();
-  if (!session) {
-    return NextResponse.json({ error: 'no response' });
-  }
   try {
+    const session = await getServerAuthSession();
+    if (!session) {
+      return NextResponse.json({ error: 'no response' });
+    }
     const body = await req.json();
     const validate = bodySchema.safeParse(body);
     if (!validate.success) {
