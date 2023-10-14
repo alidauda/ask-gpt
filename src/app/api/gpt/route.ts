@@ -45,7 +45,7 @@ export async function POST(req: Request) {
     // const body = JSON.parse(req.body);
     const docs = await loader.load();
     const textSplitter = new RecursiveCharacterTextSplitter({
-      chunkSize: 1000,
+      chunkSize: 500,
     });
     const splitDocs = await textSplitter.splitDocuments(docs);
     const embeddings = new OpenAIEmbeddings({

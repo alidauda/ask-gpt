@@ -25,7 +25,7 @@ export default function RightBar({ id }: { id: string }) {
 
   return (
     <div className=' flex flex-col col-span-3  bg-white  border-l border-gray-300  justify-between '>
-      <div className='max-h-[75vh] overflow-y-scroll scroll-auto	'>
+      <div className='max-h-[80vh] overflow-y-scroll scroll-auto	'>
         {data && <ChatSection message={data.message} isLoading={isLoading} />}
       </div>
       <form

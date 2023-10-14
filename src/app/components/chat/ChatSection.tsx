@@ -14,7 +14,7 @@ export type props = {
 export default function ChatSection({ message, isLoading }: props) {
   const load = true;
   return (
-    <div className=' text-black '>
+    <div className=' text-black min-h-[80vh]'>
       {message &&
         message.map((value, index: number) => {
           return (
