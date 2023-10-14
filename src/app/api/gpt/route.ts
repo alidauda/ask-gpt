@@ -11,11 +11,12 @@ import { getServerAuthSession } from '@/utils/auth';
 import { BufferMemory } from 'langchain/memory';
 import { ConversationalRetrievalQAChain } from 'langchain/chains';
 import prisma from '@/utils/db';
+import { HumanMessage, AIMessage } from 'langchain/schema';
 
 const bodySchema = z.object({
   pdf: z.string(),
   question: z.string(),
-  history: z.array(z.object({ answer: z.string(), question: z.string() })),
+  history: z.array(z.tuple([z.string(), z.string()])),
 });
 
 export async function POST(req: Request) {
@@ -25,13 +26,14 @@ export async function POST(req: Request) {
   }
   try {
     const body = await req.json();
-    // const validate = bodySchema.safeParse(body);
-    // if (!validate.success) {
-    //   return NextResponse.json(validate.error);
-    // }
+    const validate = bodySchema.safeParse(body);
+    if (!validate.success) {
+      return NextResponse.json(validate.error);
+    }
+    const { data } = validate;
     const url = await prisma.pdf.findUnique({
       where: {
-        id: body.pdf,
+        id: data.pdf,
       },
     });
     if (!url) {
@@ -73,7 +75,7 @@ export async function POST(req: Request) {
     <Relevant chat history excerpt as context here>  
     Standalone question: <Rephrased question here>  
     \`\`\``;
-
+    const question = new HumanMessage(body.history[0]);
     const chain = ConversationalRetrievalQAChain.fromLLM(
       model,
       vectorStore.asRetriever(),
@@ -84,8 +86,8 @@ export async function POST(req: Request) {
       }
     );
     const response = await chain.call({
-      question: body.question,
-      chat_history: body.history,
+      question: data.question,
+      chat_history: data.history,
     });
 
     
