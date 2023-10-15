@@ -64,7 +64,7 @@ export function useFetchQuestions() {
             message: postData,
           },
         ],
-        history: [...item.history, [question, postData]],
+        history: [...item.history, [question, postData.data]],
       }));
 
       setLoading(false);
