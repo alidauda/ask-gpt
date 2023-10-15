@@ -1,17 +1,14 @@
-import { CheerioWebBaseLoader } from 'langchain/document_loaders/web/cheerio';
 import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter';
 import { OpenAIEmbeddings } from 'langchain/embeddings/openai';
 import { MemoryVectorStore } from 'langchain/vectorstores/memory';
 import { WebPDFLoader } from 'langchain/document_loaders/web/pdf';
 import { ChatOpenAI } from 'langchain/chat_models/openai';
 import { NextResponse } from 'next/server';
-import { ChainValues } from 'langchain/schema';
 import * as z from 'zod';
 import { getServerAuthSession } from '@/utils/auth';
-import { BufferMemory } from 'langchain/memory';
 import { ConversationalRetrievalQAChain } from 'langchain/chains';
 import prisma from '@/utils/db';
-import { HumanMessage, AIMessage } from 'langchain/schema';
+import { HumanMessage } from 'langchain/schema';
 
 const bodySchema = z.object({
   pdf: z.string(),
@@ -20,11 +17,11 @@ const bodySchema = z.object({
 });
 
 export async function POST(req: Request) {
-  const session = await getServerAuthSession();
-  if (!session) {
-    return NextResponse.json({ error: 'no response' });
-  }
   try {
+    const session = await getServerAuthSession();
+    if (!session) {
+      return NextResponse.json({ error: 'no response', data: null });
+    }
     const body = await req.json();
     const validate = bodySchema.safeParse(body);
     if (!validate.success) {
@@ -94,8 +91,8 @@ export async function POST(req: Request) {
 
     //  let history = new ChatMessageHistory()
 
-    return NextResponse.json(response.text);
+    return NextResponse.json({ data: response.text, error: null });
   } catch (e) {
-    return NextResponse.json(e);
+    return NextResponse.json({ error: e, data: null }, { status: 500 });
   }
 }
