@@ -29,6 +29,7 @@ export default function RightBar({ id }: { id: string }) {
   }
 
   return (
+
     <div className=' flex flex-col col-span-3    border-l border-gray-300   justify-between'>
       <div className=' overflow-y-scroll scroll-auto row-span-3  h-[90%]'>
         {data && <ChatSection message={data.message} isLoading={isLoading} />}
@@ -41,7 +42,10 @@ export default function RightBar({ id }: { id: string }) {
           onChange={(e) => setQuestion(e.target.value)}
           value={question}
           type='text'
+     
           className=' w-[85%]  bg-white p-7 text-lg  '
+
+       
           placeholder='Please enter a question'
         />
 

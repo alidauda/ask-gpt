@@ -1,6 +1,7 @@
 import { getOnePdf } from '@/handlers/getPdf';
 
 export default async function LeftBar({ url }: { url: string }) {
+
   try {
     const pdf = await getOnePdf(url);
     return (
@@ -19,4 +20,6 @@ export default async function LeftBar({ url }: { url: string }) {
       </div>
     );
   }
+
+ 
 }

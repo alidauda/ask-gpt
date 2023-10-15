@@ -87,6 +87,8 @@ export async function POST(req: Request) {
       chat_history: data.history,
     });
 
+    
+
     //  let history = new ChatMessageHistory()
 
     return NextResponse.json({ data: response.text, error: null });
