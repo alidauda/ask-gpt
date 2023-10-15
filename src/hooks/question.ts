@@ -61,7 +61,7 @@ export function useFetchQuestions() {
           ...item.message,
           {
             type: 'apiMessage',
-            message: postData,
+            message: postData.data,
           },
         ],
         history: [...item.history, [question, postData.data]],
