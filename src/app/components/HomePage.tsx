@@ -8,21 +8,12 @@ import { DialogDemo } from './Dialog';
 
 export default function HomePage({ children }: { children: ReactNode }) {
   return (
-    <div className='w-full h-[100dvh]  lg:px-40 bg-purple-100'>
+    <div className='w-full h-screen  lg:px-40 bg-purple-100'>
       <nav className='w-full flex justify-between lg:p-10 p-3'>
         <div className='text-purple-700 text-2xl'>
           <Link href='/'>
             <p>ChatWPDF</p>
           </Link>
-        </div>
-        <div className='flex gap-3 justify-center items-center'>
-          <div>
-            <Input className='bg-white w-80 p-3 h-11' placeholder='search' />
-          </div>
-          <Avatar>
-            <AvatarImage src='https://github.com/shadcn.png' />
-            <AvatarFallback>CN</AvatarFallback>
-          </Avatar>
         </div>
       </nav>
 
